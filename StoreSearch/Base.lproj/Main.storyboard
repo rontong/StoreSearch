@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14113" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina4_7" orientation="portrait">
+    <device id="retina4_0" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
@@ -15,14 +15,45 @@
             <objects>
                 <viewController id="BYZ-38-t0r" customClass="SearchViewController" customModule="StoreSearch" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" keyboardDismissMode="interactive" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="TYd-7p-cEN">
+                                <rect key="frame" x="0.0" y="0.0" width="320" height="568"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <connections>
+                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="jZq-EV-A6z"/>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="8xh-Ma-3E0"/>
+                                </connections>
+                            </tableView>
+                            <searchBar contentMode="redraw" placeholder="App name, artist, song, album, e-book" translatesAutoresizingMaskIntoConstraints="NO" id="zbs-n3-wru">
+                                <rect key="frame" x="0.0" y="20" width="320" height="56"/>
+                                <textInputTraits key="textInputTraits"/>
+                                <connections>
+                                    <outlet property="delegate" destination="BYZ-38-t0r" id="eqm-vZ-VBh"/>
+                                </connections>
+                            </searchBar>
+                        </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="TYd-7p-cEN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="3lK-p7-ciw"/>
+                            <constraint firstItem="zbs-n3-wru" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="LKH-Jk-bAb"/>
+                            <constraint firstItem="TYd-7p-cEN" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="SJ0-qc-zyr"/>
+                            <constraint firstItem="zbs-n3-wru" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="T2Y-Yd-dHU"/>
+                            <constraint firstItem="TYd-7p-cEN" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="W8r-Kh-11m"/>
+                            <constraint firstItem="TYd-7p-cEN" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="ZWU-Ad-gnC"/>
+                            <constraint firstItem="zbs-n3-wru" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="hpy-0r-JGX"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="searchBar" destination="zbs-n3-wru" id="EI4-mv-bBG"/>
+                        <outlet property="tableView" destination="TYd-7p-cEN" id="nUc-VZ-EJO"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="37.5" y="31.690140845070424"/>
         </scene>
     </scenes>
 </document>
