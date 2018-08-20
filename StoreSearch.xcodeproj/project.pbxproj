@@ -10,6 +10,7 @@
 		F200E1F7212B779A00EE7F2A /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = F200E1F6212B779A00EE7F2A /* SearchResult.swift */; };
 		F200E1F9212B7CC000EE7F2A /* SearchResultCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F200E1F8212B7CC000EE7F2A /* SearchResultCell.xib */; };
 		F200E1FB212B7FFE00EE7F2A /* SearchResultCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = F200E1FA212B7FFE00EE7F2A /* SearchResultCell.swift */; };
+		F200E1FD212B855100EE7F2A /* NothingFoundCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F200E1FC212B855100EE7F2A /* NothingFoundCell.xib */; };
 		F2259512212AA107002D926B /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2259511212AA107002D926B /* AppDelegate.swift */; };
 		F2259514212AA107002D926B /* SearchViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F2259513212AA107002D926B /* SearchViewController.swift */; };
 		F2259517212AA107002D926B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2259515212AA107002D926B /* Main.storyboard */; };
@@ -21,6 +22,7 @@
 		F200E1F6212B779A00EE7F2A /* SearchResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
 		F200E1F8212B7CC000EE7F2A /* SearchResultCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = SearchResultCell.xib; sourceTree = "<group>"; };
 		F200E1FA212B7FFE00EE7F2A /* SearchResultCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchResultCell.swift; sourceTree = "<group>"; };
+		F200E1FC212B855100EE7F2A /* NothingFoundCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = NothingFoundCell.xib; sourceTree = "<group>"; };
 		F225950E212AA107002D926B /* StoreSearch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StoreSearch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2259511212AA107002D926B /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		F2259513212AA107002D926B /* SearchViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SearchViewController.swift; sourceTree = "<group>"; };
@@ -64,6 +66,7 @@
 				F200E1F6212B779A00EE7F2A /* SearchResult.swift */,
 				F200E1F8212B7CC000EE7F2A /* SearchResultCell.xib */,
 				F200E1FA212B7FFE00EE7F2A /* SearchResultCell.swift */,
+				F200E1FC212B855100EE7F2A /* NothingFoundCell.xib */,
 				F2259513212AA107002D926B /* SearchViewController.swift */,
 				F2259515212AA107002D926B /* Main.storyboard */,
 				F2259518212AA109002D926B /* Assets.xcassets */,
@@ -134,6 +137,7 @@
 				F225951C212AA109002D926B /* LaunchScreen.storyboard in Resources */,
 				F2259519212AA109002D926B /* Assets.xcassets in Resources */,
 				F200E1F9212B7CC000EE7F2A /* SearchResultCell.xib in Resources */,
+				F200E1FD212B855100EE7F2A /* NothingFoundCell.xib in Resources */,
 				F2259517212AA107002D926B /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

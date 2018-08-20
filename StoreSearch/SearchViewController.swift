@@ -19,6 +19,7 @@ class SearchViewController: UIViewController {
     // Static value can be used without an instance (does not need to be instantiated)
     struct TableViewCellIdentifiers {
         static let searchResultCell = "SearchResultCell"
+        static let nothingFoundCell = "NothingFoundCell"
     }
     
     override func viewDidLoad() {
@@ -30,9 +31,12 @@ class SearchViewController: UIViewController {
         // Set row height to 80 (to match SearchResultCell height)
         tableView.rowHeight = 80
         
-        // Load nib and register with the reuse identifier. TableView can automatically make a new cell from the nib when calling dequeueReusableCell(withIdentifier)
-        let cellNib = UINib(nibName: TableViewCellIdentifiers.searchResultCell, bundle: nil)
+        // Load and register nibs. TableView can automatically make a new cell from the nib when calling dequeueReusableCell(withIdentifier)
+        var cellNib = UINib(nibName: TableViewCellIdentifiers.searchResultCell, bundle: nil)
         tableView.register(cellNib, forCellReuseIdentifier: TableViewCellIdentifiers.searchResultCell)
+        
+        cellNib = UINib(nibName: TableViewCellIdentifiers.nothingFoundCell, bundle: nil)
+        tableView.register(cellNib, forCellReuseIdentifier: TableViewCellIdentifiers.nothingFoundCell)
     }
 
     override func didReceiveMemoryWarning() {
@@ -58,11 +62,10 @@ extension SearchViewController: UISearchBarDelegate {
             searchResult.name = String(format: "Fake Result %d for", i)
             searchResult.artistName = searchBar.text!
             searchResults.append(searchResult)
-            
+            }
         }
         hasSearched = true
         tableView.reloadData()
-    }
     }
     
     // Attach search bar to top of the screen
@@ -87,20 +90,18 @@ extension SearchViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
-        
-        // If the search array is empty then display 'Nothing Found'. Otherwise display the search results
+
+        // If the search array is empty then display .nothingFoundCell. Otherwise display the search results in a .searchResultCell
         if searchResults.count == 0 {
-            cell.nameLabel.text = "(Nothing found)"
-            cell.artistNameLabel.text = ""
+            return tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.nothingFoundCell, for: indexPath)
         } else {
-        let searchResult = searchResults[indexPath.row]
-        cell.nameLabel.text = searchResult.name
-        cell.artistNameLabel.text = searchResult.artistName
-        }
-        return cell
+            let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
+            let searchResult = searchResults[indexPath.row]
+            cell.nameLabel.text = searchResult.name
+            cell.artistNameLabel.text = searchResult.artistName
+            return cell
+            }
     }
-    
 }
 
 extension SearchViewController: UITableViewDelegate {
