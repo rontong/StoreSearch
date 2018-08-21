@@ -16,14 +16,17 @@ class SearchViewController: UIViewController {
     var searchResults = [SearchResult]()
     var hasSearched = false
     
-    // Static value can be used without an instance (does not need to be instantiated)
     struct TableViewCellIdentifiers {
+        // Static value can be used without an instance (does not need to be instantiated)
+
         static let searchResultCell = "SearchResultCell"
         static let nothingFoundCell = "NothingFoundCell"
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        searchBar.becomeFirstResponder()
         
         // Content inset attribute. Tell tableView to add 64-pt margin at the top (20pt status and 44pt search bar)
         tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 0, right: 0)
@@ -48,9 +51,9 @@ class SearchViewController: UIViewController {
 
 extension SearchViewController: UISearchBarDelegate {
    
-    // Create an array and add searchBar.text to the array
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
+        // Create an array and add searchBar.text to the array
+
         searchBar.resignFirstResponder()
         
         searchResults = [SearchResult]()
@@ -68,8 +71,9 @@ extension SearchViewController: UISearchBarDelegate {
         tableView.reloadData()
     }
     
-    // Attach search bar to top of the screen
     func position(for bar: UIBarPositioning) -> UIBarPosition {
+        // Attach search bar to top of the screen
+
         return .topAttached
     }
 }
@@ -106,13 +110,13 @@ extension SearchViewController: UITableViewDataSource {
 
 extension SearchViewController: UITableViewDelegate {
     
-    // Deselect row after a tap
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Deselect row after a tap
         tableView.deselectRow(at: indexPath, animated: true)
     }
     
-    // Only allows rows with search results to be selected
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+        // Only allows rows with search results to be selected
         if searchResults.count == 0 {
             return nil
         } else {
