@@ -46,29 +46,38 @@ class SearchViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
+// MARK: - NETWORKING
+    
+    func iTunesURL(searchText: String) -> URL {
+        // Place text from search bar into the url, then turn it into a URL object. Use URL encoding. 
+        // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
+        
+        let escapedSearchText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
+        let urlString = String(format: "https://itunes.apple.com/search?term=%@", escapedSearchText)
+        let url = URL(string: urlString)
+        return url!
+    }
 
 }
+
+// MARK: - SEARCH BAR DELEGATE METHODS
 
 extension SearchViewController: UISearchBarDelegate {
    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // Create an array and add searchBar.text to the array
-
-        searchBar.resignFirstResponder()
+        // If there is a search term then load the text into the iTunesURL
         
+        if !searchBar.text!.isEmpty{
+        searchBar.resignFirstResponder()
+            
+        hasSearched = true
         searchResults = [SearchResult]()
         
-        // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
-        if searchBar.text! != "justin bieber" {
-        for i in 0...2 {
-            let searchResult = SearchResult()
-            searchResult.name = String(format: "Fake Result %d for", i)
-            searchResult.artistName = searchBar.text!
-            searchResults.append(searchResult)
-            }
+        let url = iTunesURL(searchText: searchBar.text!)
+            print("URL: '\(url)'")
+            tableView.reloadData()
         }
-        hasSearched = true
-        tableView.reloadData()
     }
     
     func position(for bar: UIBarPositioning) -> UIBarPosition {
@@ -77,6 +86,8 @@ extension SearchViewController: UISearchBarDelegate {
         return .topAttached
     }
 }
+
+// MARK: - TABLE VIEW DATA SOURCE
 
 extension SearchViewController: UITableViewDataSource {
     
@@ -107,6 +118,8 @@ extension SearchViewController: UITableViewDataSource {
             }
     }
 }
+
+// MARK: - TABLE VIEW DELEGATE METHODS
 
 extension SearchViewController: UITableViewDelegate {
     
