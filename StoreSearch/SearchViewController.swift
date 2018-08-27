@@ -58,8 +58,62 @@ class SearchViewController: UIViewController {
         let url = URL(string: urlString)
         return url!
     }
+    
+    func performStoreRequest(with url: URL) -> String? {
+        
+        // Return a string object with data received from the server
+        do {
+            return try String(contentsOf: url, encoding: .utf8)
+        } catch {
+            print("Download Error: \(error)")
+            return nil
+        }
+    }
+    
+    func showNetworkError() {
+        let alert = UIAlertController(title: "Whoops...", message: "There was an error reading from the iTunes Store. Please try again.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alert.addAction(action)
+        present(alert, animated: true, completion: nil)
+    }
 
 }
+
+// MARK: - JSON PARSING
+
+    func parse(json: String) -> [String: Any]? {
+        
+        // Place JSON string into a Data object. Guard let unwraps the optional json.data(). If it returns nil then execute else block.
+        guard let data = json.data(using: .utf8, allowLossyConversion: false)
+            else { return nil }
+        
+        // Convert JSON search results to a dictionary [String: Any]
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        } catch {
+            print("JSON Error: \(error)")
+            return nil
+        }
+}
+        
+    func parse(dictionary: [String: Any]) {
+        
+        // If dictionary has a key named "results" then continue
+        guard let array = dictionary["results"] as? [Any] else {
+            print("Expected 'results' array")
+            return
+        }
+        
+        // Look at each element in the array. Each element is a dictionary thus is cast as the type [String: Any], then print the wrapperType and kind
+        for resultDict in array {
+            if let resultDict = resultDict as? [String: Any] {
+                if let wrapperType = resultDict["wrapperType"] as? String,
+                    let kind = resultDict["kind"] as? String {
+                    print("wrapperType: \(wrapperType), kind: \(kind)")
+                }
+            }
+        }
+    }
 
 // MARK: - SEARCH BAR DELEGATE METHODS
 
@@ -76,7 +130,16 @@ extension SearchViewController: UISearchBarDelegate {
         
         let url = iTunesURL(searchText: searchBar.text!)
             print("URL: '\(url)'")
-            tableView.reloadData()
+            
+            if let jsonString = performStoreRequest(with: url) {
+                if let jsonDictionary = parse(json: jsonString) {
+                    print("Dictionary \(jsonDictionary)")
+                    parse(dictionary: jsonDictionary)
+                    tableView.reloadData()
+                return
+                }
+            }
+            showNetworkError()
         }
     }
     
@@ -105,7 +168,6 @@ extension SearchViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-
         // If the search array is empty then display .nothingFoundCell. Otherwise display the search results in a .searchResultCell
         if searchResults.count == 0 {
             return tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.nothingFoundCell, for: indexPath)
