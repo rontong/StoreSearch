@@ -251,35 +251,35 @@ extension SearchViewController: UISearchBarDelegate {
         
         // Asynchronous: Place networking code in a closure to be placed in a queue. UI code should always be performed on the main thread (use main queue).
         
-            // Get a reference to the queue
-            let queue = DispatchQueue.global()
-            
-            // Dispatch a closure on the queue. Code inside the { closure } is executed asynchronously in the background.
-            queue.async {
-                let url = self.iTunesURL(searchText: searchBar.text!)
-            
-                if let jsonString = self.performStoreRequest(with: url),
-                let jsonDictionary = parse(json: jsonString) {
-                    
-                    self.searchResults = parse(dictionary: jsonDictionary)
-                    
-                    // Sort search results alphabetically. Closure determines sorting rules; compares SearchResult objects and returns true if result1 comes before result2
-                    // ALTERNATIVE: searchResults.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }, OR searchResults.sort(by: <)
-                    self.searchResults.sort { $0 < $1 }
-               
-                    // Use main queue to schedule tasks on the main thread (eg UI code)
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        self.tableView.reloadData()
-                    }
-                    return
-                }
+        // Get a reference to the queue
+        let queue = DispatchQueue.global()
+        
+        // Dispatch a closure on the queue. Code inside the { closure } is executed asynchronously in the background.
+        queue.async {
+            let url = self.iTunesURL(searchText: searchBar.text!)
+        
+            if let jsonString = self.performStoreRequest(with: url),
+            let jsonDictionary = parse(json: jsonString) {
+                
+                self.searchResults = parse(dictionary: jsonDictionary)
+                
+                // Sort search results alphabetically. Closure determines sorting rules; compares SearchResult objects and returns true if result1 comes before result2
+                // ALTERNATIVE: searchResults.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }, OR searchResults.sort(by: <)
+                self.searchResults.sort { $0 < $1 }
+           
+                // Use main queue to schedule tasks on the main thread (eg UI code)
                 DispatchQueue.main.async {
-                    self.showNetworkError()
+                    self.isLoading = false
+                    self.tableView.reloadData()
                 }
-                }
+                return
+            }
+            DispatchQueue.main.async {
+                self.showNetworkError()
+            }
             }
         }
+    }
     
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         // Attach search bar to top of the screen
