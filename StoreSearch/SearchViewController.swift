@@ -80,16 +80,6 @@ class SearchViewController: UIViewController {
         return url!
     }
     
-    func performStoreRequest(with url: URL) -> String? {
-        // Return a string object with data received from the server
-        do {
-            return try String(contentsOf: url, encoding: .utf8)
-        } catch {
-            print("Download Error: \(error)")
-            return nil
-        }
-    }
-    
     func showNetworkError() {
         let alert = UIAlertController(title: "Whoops...", message: "There was an error reading from the iTunes Store. Please try again.", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -249,38 +239,30 @@ extension SearchViewController: UISearchBarDelegate {
         hasSearched = true
         searchResults = [SearchResult]()
         
-        // Asynchronous: Place networking code in a closure to be placed in a queue. UI code should always be performed on the main thread (use main queue).
-        
-        // Get a reference to the queue
-        let queue = DispatchQueue.global()
-        
-        // Dispatch a closure on the queue. Code inside the { closure } is executed asynchronously in the background.
-        queue.async {
+            // Create URL object using search text
             let url = self.iTunesURL(searchText: searchBar.text!)
-        
-            if let jsonString = self.performStoreRequest(with: url),
-            let jsonDictionary = parse(json: jsonString) {
-                
-                self.searchResults = parse(dictionary: jsonDictionary)
-                
-                // Sort search results alphabetically. Closure determines sorting rules; compares SearchResult objects and returns true if result1 comes before result2
-                // ALTERNATIVE: searchResults.sort { $0.name.localizedStandardCompare($1.name) == .orderedAscending }, OR searchResults.sort(by: <)
-                self.searchResults.sort { $0 < $1 }
-           
-                // Use main queue to schedule tasks on the main thread (eg UI code)
-                DispatchQueue.main.async {
-                    self.isLoading = false
-                    self.tableView.reloadData()
+            
+            // Obtain URLSession object
+            let session = URLSession.shared
+            
+            // Create data task. Send HTTPS GET requests to the server at url. Completion handler is invoked when data task recieves a reply from the server
+            let dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
+                if let error = error {
+                    print("Failure! \(error)")
+                    
+                // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
+                } else if let httpResponse = response as? HTTPURLResponse,
+                    httpResponse.statusCode == 200 {
+                    print("Success! \(data!)")
+                } else {
+                    print("Failure! \(response)")
                 }
-                return
-            }
-            DispatchQueue.main.async {
-                self.showNetworkError()
-            }
-            }
+            })
+            // Call resume to send request to the server once data task is created
+            dataTask.resume()
         }
     }
-    
+
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         // Attach search bar to top of the screen
 
