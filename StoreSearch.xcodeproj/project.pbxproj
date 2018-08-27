@@ -16,6 +16,7 @@
 		F2259517212AA107002D926B /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F2259515212AA107002D926B /* Main.storyboard */; };
 		F2259519212AA109002D926B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = F2259518212AA109002D926B /* Assets.xcassets */; };
 		F225951C212AA109002D926B /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F225951A212AA109002D926B /* LaunchScreen.storyboard */; };
+		F2E661B82134B462008EE76E /* LoadingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F2E661B72134B462008EE76E /* LoadingCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +31,7 @@
 		F2259518212AA109002D926B /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F225951B212AA109002D926B /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		F225951D212AA109002D926B /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		F2E661B72134B462008EE76E /* LoadingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoadingCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -67,6 +69,7 @@
 				F200E1F8212B7CC000EE7F2A /* SearchResultCell.xib */,
 				F200E1FA212B7FFE00EE7F2A /* SearchResultCell.swift */,
 				F200E1FC212B855100EE7F2A /* NothingFoundCell.xib */,
+				F2E661B72134B462008EE76E /* LoadingCell.xib */,
 				F2259513212AA107002D926B /* SearchViewController.swift */,
 				F2259515212AA107002D926B /* Main.storyboard */,
 				F2259518212AA109002D926B /* Assets.xcassets */,
@@ -136,6 +139,7 @@
 			files = (
 				F225951C212AA109002D926B /* LaunchScreen.storyboard in Resources */,
 				F2259519212AA109002D926B /* Assets.xcassets in Resources */,
+				F2E661B82134B462008EE76E /* LoadingCell.xib in Resources */,
 				F200E1F9212B7CC000EE7F2A /* SearchResultCell.xib in Resources */,
 				F200E1FD212B855100EE7F2A /* NothingFoundCell.xib in Resources */,
 				F2259517212AA107002D926B /* Main.storyboard in Resources */,
