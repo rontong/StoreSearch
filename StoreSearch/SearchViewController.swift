@@ -16,6 +16,7 @@ class SearchViewController: UIViewController {
     var searchResults = [SearchResult]()
     var hasSearched = false
     var isLoading = false
+    var dataTask: URLSessionDataTask?
     
     struct TableViewCellIdentifiers {
         // Static value can be used without an instance (does not need to be instantiated)
@@ -75,7 +76,7 @@ class SearchViewController: UIViewController {
         // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
         
         let escapedSearchText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-        let urlString = String(format: "https://itunes.apple.com/searchLOL?term=%@&limit=200", escapedSearchText)
+        let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", escapedSearchText)
         let url = URL(string: urlString)
         return url!
     }
@@ -223,63 +224,63 @@ func parse(ebook dictionary: [String: Any]) -> SearchResult {
 extension SearchViewController: UISearchBarDelegate {
    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        // If there is a search term then load the text into the iTunesURL
         
         if !searchBar.text!.isEmpty {
         searchBar.resignFirstResponder()
-            
+        
+        // If there is an active data task, cancel it so old search doesn't get in the way of a new search
+        dataTask?.cancel()
         isLoading = true
         tableView.reloadData()
-            
         hasSearched = true
         searchResults = [SearchResult]()
         
-            // Create URL object using search text
-            let url = iTunesURL(searchText: searchBar.text!)
+        // Create URL object using search text. Create a URLSession object.
+        let url = iTunesURL(searchText: searchBar.text!)
+        let session = URLSession.shared
+        
+        // Create a data task to Send HTTPS GET requests to the server at url. Returns Data, URL Response, and Error. Completion handler is invoked on a background thread when data task recieves a reply from the server
+        dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
             
-            // Obtain URLSession object
-            let session = URLSession.shared
+            print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
             
-            // Create data task. Send HTTPS GET requests to the server at url. Completion handler is invoked on a background thread when data task recieves a reply from the server
-            let dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
+            // Exit closure if error code -999 (cancel error)
+            if let error = error as? NSError, error.code == -999 {
+                return
                 
-                print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
+            // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
+            } else if let httpResponse = response as? HTTPURLResponse,
+                httpResponse.statusCode == 200 {
                 
-                if let error = error {
-                    print("Failure! \(error)")
+                // Unwrap the optional object from the data parameter, convert it to a dictionary, then convert it to a SearchResult object by parsing. Return exits closure.
+                if let data = data, let jsonDictionary = parse(json: data) {
+                    self.searchResults = parse(dictionary: jsonDictionary)
+                    self.searchResults.sort(by: < )
                     
-                // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
-                } else if let httpResponse = response as? HTTPURLResponse,
-                    httpResponse.statusCode == 200 {
-                    
-                    // Unwrap the optional object from the data parameter, convert it to a dictionary, then convert it to a SearchResult object by parsing. Return exits closure.
-                    if let data = data, let jsonDictionary = parse(json: data) {
-                        self.searchResults = parse(dictionary: jsonDictionary)
-                        self.searchResults.sort(by: < )
-                        
-                        // Use main queue to update UI on the main thread
-                        DispatchQueue.main.async {
-                            self.isLoading = false
-                            self.tableView.reloadData()
-                        }
-                        return
+                    // Use main queue to update UI on the main thread
+                    DispatchQueue.main.async {
+                        self.isLoading = false
+                        self.tableView.reloadData()
                     }
-                } else {
-                    print("Failure! \(response)")
+                    return
                 }
-                
-                DispatchQueue.main.async {
-                    self.hasSearched = false
-                    self.isLoading = false
-                    self.tableView.reloadData()
-                    self.showNetworkError()
-                }
-                
-            })
-            // Call resume to send request to the server once data task is created
-            dataTask.resume()
-        }
+            } else {
+                print("Failure! \(response)")
+            }
+            
+            // Update UI if there is an error 
+            DispatchQueue.main.async {
+                self.hasSearched = false
+                self.isLoading = false
+                self.tableView.reloadData()
+                self.showNetworkError()
+            }
+            
+        })
+        // Call resume to send request to the server once data task is created
+        dataTask?.resume()
     }
+}
 
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         // Attach search bar to top of the screen
