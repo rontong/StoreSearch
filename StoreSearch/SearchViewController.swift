@@ -12,6 +12,7 @@ class SearchViewController: UIViewController {
 
     @IBOutlet weak var searchBar: UISearchBar!
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var segmentedControl: UISegmentedControl!
     
     var searchResults = [SearchResult]()
     var hasSearched = false
@@ -32,7 +33,7 @@ class SearchViewController: UIViewController {
         searchBar.becomeFirstResponder()
         
         // Content inset attribute. Tell tableView to add 64-pt margin at the top (20pt status and 44pt search bar)
-        tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 0, right: 0)
+        tableView.contentInset = UIEdgeInsets(top: 108, left: 0, bottom: 0, right: 0)
         
         // Set row height to 80 (to match SearchResultCell height)
         tableView.rowHeight = 80
@@ -69,14 +70,30 @@ class SearchViewController: UIViewController {
         }
     }
     
+    @IBAction func segmentChanged(_ sender: UISegmentedControl) {
+        print("Segment changed: \(sender.selectedSegmentIndex)")
+        performSearch()
+    }
+    
 // MARK: - NETWORKING
     
-    func iTunesURL(searchText: String) -> URL {
-        // Place text from search bar into the url, then turn it into a URL object. Use URL encoding. 
-        // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
+    func iTunesURL(searchText: String, category: Int) -> URL {
+        // Convert search text into a URL
         
+        // Convert category index from a number to a string to be added to the URL
+        let entityName: String
+        switch category {
+        case 1: entityName = "musicTrack"
+        case 2: entityName = "software"
+        case 3: entityName = "ebook"
+        default: entityName = ""
+        }
+        
+        // Place text from search bar into the url, then turn it into a URL object. Use URL encoding.
+        // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
         let escapedSearchText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-        let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", escapedSearchText)
+        let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200&entity=%@", escapedSearchText, entityName)
+        
         let url = URL(string: urlString)
         return url!
     }
@@ -87,7 +104,65 @@ class SearchViewController: UIViewController {
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
     }
-
+    
+    func performSearch(){
+        
+        if !searchBar.text!.isEmpty {
+            searchBar.resignFirstResponder()
+            
+            // If there is an active data task, cancel it so old search doesn't get in the way of a new search
+            dataTask?.cancel()
+            isLoading = true
+            tableView.reloadData()
+            hasSearched = true
+            searchResults = [SearchResult]()
+            
+            // Create URL object using search text. Create a URLSession object.
+            let url = iTunesURL(searchText: searchBar.text!, category: segmentedControl.selectedSegmentIndex)
+            let session = URLSession.shared
+            
+            // Create a data task to Send HTTPS GET requests to the server at url. Returns Data, URL Response, and Error. Completion handler is invoked on a background thread when data task recieves a reply from the server
+            dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
+                
+                print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
+                
+                // Exit closure if error code -999 (cancel error)
+                if let error = error as? NSError, error.code == -999 {
+                    return
+                    
+                    // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
+                } else if let httpResponse = response as? HTTPURLResponse,
+                    httpResponse.statusCode == 200 {
+                    
+                    // Unwrap the optional object from the data parameter, convert it to a dictionary, then convert it to a SearchResult object by parsing. Return exits closure.
+                    if let data = data, let jsonDictionary = parse(json: data) {
+                        self.searchResults = parse(dictionary: jsonDictionary)
+                        self.searchResults.sort(by: < )
+                        
+                        // Use main queue to update UI on the main thread
+                        DispatchQueue.main.async {
+                            self.isLoading = false
+                            self.tableView.reloadData()
+                        }
+                        return
+                    }
+                } else {
+                    print("Failure! \(response)")
+                }
+                
+                // Update UI if there is an error
+                DispatchQueue.main.async {
+                    self.hasSearched = false
+                    self.isLoading = false
+                    self.tableView.reloadData()
+                    self.showNetworkError()
+                }
+                
+            })
+            // Call resume to send request to the server once data task is created
+            dataTask?.resume()
+        }
+    }
 }
 
 // MARK: - JSON PARSING
@@ -224,67 +299,11 @@ func parse(ebook dictionary: [String: Any]) -> SearchResult {
 extension SearchViewController: UISearchBarDelegate {
    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        
-        if !searchBar.text!.isEmpty {
-        searchBar.resignFirstResponder()
-        
-        // If there is an active data task, cancel it so old search doesn't get in the way of a new search
-        dataTask?.cancel()
-        isLoading = true
-        tableView.reloadData()
-        hasSearched = true
-        searchResults = [SearchResult]()
-        
-        // Create URL object using search text. Create a URLSession object.
-        let url = iTunesURL(searchText: searchBar.text!)
-        let session = URLSession.shared
-        
-        // Create a data task to Send HTTPS GET requests to the server at url. Returns Data, URL Response, and Error. Completion handler is invoked on a background thread when data task recieves a reply from the server
-        dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
-            
-            print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
-            
-            // Exit closure if error code -999 (cancel error)
-            if let error = error as? NSError, error.code == -999 {
-                return
-                
-            // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
-            } else if let httpResponse = response as? HTTPURLResponse,
-                httpResponse.statusCode == 200 {
-                
-                // Unwrap the optional object from the data parameter, convert it to a dictionary, then convert it to a SearchResult object by parsing. Return exits closure.
-                if let data = data, let jsonDictionary = parse(json: data) {
-                    self.searchResults = parse(dictionary: jsonDictionary)
-                    self.searchResults.sort(by: < )
-                    
-                    // Use main queue to update UI on the main thread
-                    DispatchQueue.main.async {
-                        self.isLoading = false
-                        self.tableView.reloadData()
-                    }
-                    return
-                }
-            } else {
-                print("Failure! \(response)")
-            }
-            
-            // Update UI if there is an error 
-            DispatchQueue.main.async {
-                self.hasSearched = false
-                self.isLoading = false
-                self.tableView.reloadData()
-                self.showNetworkError()
-            }
-            
-        })
-        // Call resume to send request to the server once data task is created
-        dataTask?.resume()
+        performSearch()
     }
-}
-
+    
     func position(for bar: UIBarPositioning) -> UIBarPosition {
         // Attach search bar to top of the screen
-
         return .topAttached
     }
 }

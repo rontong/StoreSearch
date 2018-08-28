@@ -33,21 +33,46 @@
                                     <outlet property="delegate" destination="BYZ-38-t0r" id="eqm-vZ-VBh"/>
                                 </connections>
                             </searchBar>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="xil-61-8lv">
+                                <rect key="frame" x="0.0" y="74" width="320" height="44"/>
+                                <items>
+                                    <navigationItem id="fm6-ro-bKU">
+                                        <nil key="title"/>
+                                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="qCP-WN-IdG">
+                                            <rect key="frame" x="10" y="7" width="300" height="30"/>
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <segments>
+                                                <segment title="All"/>
+                                                <segment title="Music"/>
+                                                <segment title="Software"/>
+                                                <segment title="E-books"/>
+                                            </segments>
+                                            <connections>
+                                                <action selector="segmentChanged:" destination="BYZ-38-t0r" eventType="valueChanged" id="Y48-nw-AH4"/>
+                                            </connections>
+                                        </segmentedControl>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
                             <constraint firstItem="TYd-7p-cEN" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="3lK-p7-ciw"/>
+                            <constraint firstItem="xil-61-8lv" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="5B8-ag-aiZ"/>
+                            <constraint firstItem="xil-61-8lv" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="54" id="6lG-uo-fA7"/>
                             <constraint firstItem="zbs-n3-wru" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="LKH-Jk-bAb"/>
                             <constraint firstItem="TYd-7p-cEN" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="SJ0-qc-zyr"/>
                             <constraint firstItem="zbs-n3-wru" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="T2Y-Yd-dHU"/>
                             <constraint firstItem="TYd-7p-cEN" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="W8r-Kh-11m"/>
                             <constraint firstItem="TYd-7p-cEN" firstAttribute="top" secondItem="8bC-Xf-vdC" secondAttribute="top" id="ZWU-Ad-gnC"/>
                             <constraint firstItem="zbs-n3-wru" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="hpy-0r-JGX"/>
+                            <constraint firstItem="xil-61-8lv" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="qGE-mD-guE"/>
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
                         <outlet property="searchBar" destination="zbs-n3-wru" id="EI4-mv-bBG"/>
+                        <outlet property="segmentedControl" destination="qCP-WN-IdG" id="tnQ-Ur-myZ"/>
                         <outlet property="tableView" destination="TYd-7p-cEN" id="nUc-VZ-EJO"/>
                     </connections>
                 </viewController>
