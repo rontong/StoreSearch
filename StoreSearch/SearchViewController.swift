@@ -75,7 +75,7 @@ class SearchViewController: UIViewController {
         // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
         
         let escapedSearchText = searchText.addingPercentEncoding(withAllowedCharacters: CharacterSet.urlQueryAllowed)!
-        let urlString = String(format: "https://itunes.apple.com/search?term=%@&limit=200", escapedSearchText)
+        let urlString = String(format: "https://itunes.apple.com/searchLOL?term=%@&limit=200", escapedSearchText)
         let url = URL(string: urlString)
         return url!
     }
@@ -91,14 +91,9 @@ class SearchViewController: UIViewController {
 
 // MARK: - JSON PARSING
 
-    func parse(json: String) -> [String: Any]? {
-        // Convert JSON string to a Data object, then to a Dictionary.
+    func parse(json data: Data) -> [String: Any]? {
+    // Convert JSON Data to a dictionary [String: Any]
         
-        // Place JSON string into a Data object. Guard let unwraps the optional json.data(). If it returns nil then execute else block.
-        guard let data = json.data(using: .utf8, allowLossyConversion: false)
-            else { return nil }
-        
-        // Convert JSON search results to a dictionary [String: Any]
         do {
             return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
         } catch {
@@ -147,7 +142,7 @@ class SearchViewController: UIViewController {
     }
 
 func parse(track dictionary: [String: Any]) -> SearchResult {
-    // Get values from the given dictionary and place into SearchResult properties
+    // Convert Dictionary into a SearchResult object
     
     let searchResult = SearchResult()
 
@@ -240,23 +235,46 @@ extension SearchViewController: UISearchBarDelegate {
         searchResults = [SearchResult]()
         
             // Create URL object using search text
-            let url = self.iTunesURL(searchText: searchBar.text!)
+            let url = iTunesURL(searchText: searchBar.text!)
             
             // Obtain URLSession object
             let session = URLSession.shared
             
-            // Create data task. Send HTTPS GET requests to the server at url. Completion handler is invoked when data task recieves a reply from the server
+            // Create data task. Send HTTPS GET requests to the server at url. Completion handler is invoked on a background thread when data task recieves a reply from the server
             let dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
+                
+                print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
+                
                 if let error = error {
                     print("Failure! \(error)")
                     
                 // response is of URLResponse type so has to be cast as HTTPURLResponse to look at the statusCode. The comma combines checks into a single line
                 } else if let httpResponse = response as? HTTPURLResponse,
                     httpResponse.statusCode == 200 {
-                    print("Success! \(data!)")
+                    
+                    // Unwrap the optional object from the data parameter, convert it to a dictionary, then convert it to a SearchResult object by parsing. Return exits closure.
+                    if let data = data, let jsonDictionary = parse(json: data) {
+                        self.searchResults = parse(dictionary: jsonDictionary)
+                        self.searchResults.sort(by: < )
+                        
+                        // Use main queue to update UI on the main thread
+                        DispatchQueue.main.async {
+                            self.isLoading = false
+                            self.tableView.reloadData()
+                        }
+                        return
+                    }
                 } else {
                     print("Failure! \(response)")
                 }
+                
+                DispatchQueue.main.async {
+                    self.hasSearched = false
+                    self.isLoading = false
+                    self.tableView.reloadData()
+                    self.showNetworkError()
+                }
+                
             })
             // Call resume to send request to the server once data task is created
             dataTask.resume()
