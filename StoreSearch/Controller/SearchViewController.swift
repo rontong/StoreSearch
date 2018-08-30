@@ -19,6 +19,8 @@ class SearchViewController: UIViewController {
     var isLoading = false
     var dataTask: URLSessionDataTask?
     
+    var landscapeViewController: LandscapeViewController?
+    
     struct TableViewCellIdentifiers {
         // Static value can be used without an instance (does not need to be instantiated)
 
@@ -56,6 +58,56 @@ class SearchViewController: UIViewController {
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
         print("Segment changed: \(sender.selectedSegmentIndex)")
         performSearch()
+    }
+    
+    override func willTransition(to newCollection: UITraitCollection, with coordinator: UIViewControllerTransitionCoordinator) {
+        // Rotating device will trigger either showLandscape() or hideLandscape()
+        
+        super.willTransition(to: newCollection, with: coordinator)
+        
+        switch newCollection.verticalSizeClass {
+        case .compact: showLandscape(with: coordinator)
+        case .regular, .unspecified: hideLandscape(with: coordinator)
+        }
+    }
+    
+    func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        // There should never be a second landscapeVC, if it is not nil then return
+        guard landscapeViewController == nil else {return}
+        
+        // Find the scene with Storyboard ID LandscapeViewController and instantiate it
+        landscapeViewController = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as? LandscapeViewController
+        
+        // Set size and position: frame of landscape view is as big as SearchViewController bounds
+        if let controller = landscapeViewController {
+            controller.view.frame = view.bounds
+            controller.view.alpha = 0
+            
+            // Add landscape controller's view as a subview (on top of the tableview and search bar)
+            view.addSubview(controller.view)
+            
+            // Tell SearchVC that LandscapeVC is now in control
+            addChildViewController(controller)
+            
+            // Animate, then tell new VC it has a parent controller
+            coordinator.animate(alongsideTransition: { _ in
+                controller.view.alpha = 1
+            }, completion: { _ in
+                controller.didMove(toParentViewController: self)
+            })
+        }
+    }
+    
+    func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        
+        // Tell VC it is leaving the VC hierarchy, remove the view from screen, and dispose of VC. Set to nil to remove strong reference. 
+        if let controller = landscapeViewController {
+            controller.willMove(toParentViewController: nil)
+            controller.view.removeFromSuperview()
+            controller.removeFromParentViewController()
+            landscapeViewController = nil
+        }
     }
     
 // MARK: - NETWORKING
