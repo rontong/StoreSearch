@@ -18,6 +18,9 @@ class DetailViewController: UIViewController {
     @IBOutlet weak var genreLabel: UILabel!
     @IBOutlet weak var priceButton: UIButton!
     
+    var searchResult: SearchResult!
+    var downloadTask: URLSessionDownloadTask?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -32,11 +35,14 @@ class DetailViewController: UIViewController {
         gestureRecognizer.cancelsTouchesInView = false
         gestureRecognizer.delegate = self
         view.addGestureRecognizer(gestureRecognizer)
+        
+        if searchResult != nil {
+            updateUI()
+        }
     }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -46,21 +52,56 @@ class DetailViewController: UIViewController {
         modalPresentationStyle = .custom
         transitioningDelegate = self
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    func updateUI() {
+        nameLabel.text = searchResult.name
+        
+        if searchResult.artistName.isEmpty {
+            artistNameLabel.text = "Unknown"
+        } else {
+            artistNameLabel.text = String(searchResult.artistName)
+        }
+        
+        kindLabel.text = searchResult.kindForDisplay()
+        genreLabel.text = searchResult.genre
+        
+        artworkImageView.image = UIImage(named: "Placeholder")
+        if let largeURL = URL(string: searchResult.artworkLargeURL) {
+            downloadTask = artworkImageView.loadImage(url: largeURL)
+        }
+        
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .currency
+        formatter.currencyCode = searchResult.currency
+        
+        let priceText: String
+        if searchResult.price == 0 {
+            priceText = "Free"
+        } else if let text = formatter.string(from: searchResult.price as NSNumber) {
+            priceText = text
+        } else {
+            priceText = ""
+        }
+        priceButton.setTitle(priceText, for: .normal)
     }
-    */
 
     @IBAction func close() {
         dismiss(animated: true, completion: nil)
     }
     
+    @IBAction func openInStore(_ sender: UIButton) {
+        
+        // Tell UIApplication to open URL
+        if let url = URL(string: searchResult.storeURL) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        }
+    }
+    
+    deinit {
+        // Cancel image download if user closes pop-up before download is complete
+        print("deinit \(self)")
+        downloadTask?.cancel()
+    }
 }
 
 extension DetailViewController: UIViewControllerTransitioningDelegate {

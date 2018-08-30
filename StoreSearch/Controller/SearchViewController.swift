@@ -51,7 +51,6 @@ class SearchViewController: UIViewController {
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
     
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
@@ -298,7 +297,7 @@ extension SearchViewController: UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        // If search term has not been used do not return any rows. If loading return 1 row to display loadingCell. If the search array is empty return 1 row to display nothingFoundCell
+        // If search term has not been used do not return any rows. If loading return 1 row to display loadingCell. If the search array is empty return 1 row to display nothingFoundCell, if loading then return 1 row to display loadingCell
         if isLoading {
             return 1
         } else if !hasSearched {
@@ -337,7 +336,7 @@ extension SearchViewController: UITableViewDataSource {
 extension SearchViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Deselect row after a tap and Segue to DetailVC. Send the indexPath through the sender parameter. 
+        // Deselect row after a tap and Segue to DetailVC. Send the indexPath through the sender parameter.
         tableView.deselectRow(at: indexPath, animated: true)
         performSegue(withIdentifier: "ShowDetail", sender: indexPath)
     }
@@ -348,6 +347,15 @@ extension SearchViewController: UITableViewDelegate {
             return nil
         } else {
             return indexPath
+        }
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowDetail" {
+            let detailVC = segue.destination as! DetailViewController
+            let indexPath = sender as! IndexPath
+            let searchResult = searchResults[indexPath.row]
+            detailVC.searchResult = searchResult
         }
     }
 }
