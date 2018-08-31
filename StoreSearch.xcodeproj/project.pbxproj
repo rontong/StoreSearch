@@ -22,6 +22,7 @@
 		F26264A5213755ED0021731A /* UIImageView+DownloadImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26264A4213755ED0021731A /* UIImageView+DownloadImage.swift */; };
 		F26264AA2137623E0021731A /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26264A92137623E0021731A /* DetailViewController.swift */; };
 		F26264AC2137649A0021731A /* DimmingPresentationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F26264AB2137649A0021731A /* DimmingPresentationController.swift */; };
+		F29DFE0F21391E6400DB5121 /* FadeOutAnimationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = F29DFE0E21391E6400DB5121 /* FadeOutAnimationController.swift */; };
 		F2E661B82134B462008EE76E /* LoadingCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = F2E661B72134B462008EE76E /* LoadingCell.xib */; };
 /* End PBXBuildFile section */
 
@@ -43,6 +44,7 @@
 		F26264A4213755ED0021731A /* UIImageView+DownloadImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+DownloadImage.swift"; sourceTree = "<group>"; };
 		F26264A92137623E0021731A /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
 		F26264AB2137649A0021731A /* DimmingPresentationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DimmingPresentationController.swift; sourceTree = "<group>"; };
+		F29DFE0E21391E6400DB5121 /* FadeOutAnimationController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FadeOutAnimationController.swift; sourceTree = "<group>"; };
 		F2E661B72134B462008EE76E /* LoadingCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = LoadingCell.xib; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -117,6 +119,7 @@
 				F2588A112137D104009CAB2C /* BounceAnimationController.swift */,
 				F2588A132137D629009CAB2C /* SlideOutAnimationController.swift */,
 				F2588A152137D957009CAB2C /* LandscapeViewController.swift */,
+				F29DFE0E21391E6400DB5121 /* FadeOutAnimationController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -196,6 +199,7 @@
 			files = (
 				F2259514212AA107002D926B /* SearchViewController.swift in Sources */,
 				F26264AC2137649A0021731A /* DimmingPresentationController.swift in Sources */,
+				F29DFE0F21391E6400DB5121 /* FadeOutAnimationController.swift in Sources */,
 				F200E1F7212B779A00EE7F2A /* SearchResult.swift in Sources */,
 				F200E1FB212B7FFE00EE7F2A /* SearchResultCell.swift in Sources */,
 				F2588A122137D104009CAB2C /* BounceAnimationController.swift in Sources */,

@@ -11,14 +11,18 @@ import UIKit
 class GradientView: UIView {
     
     override init(frame: CGRect) {
-        // Set background colour to transparent
         super.init(frame: frame)
+        
+        // Change width and heigh when superview resizes
+        autoresizingMask = [.flexibleWidth , .flexibleHeight]
+        
+        // Set background colour to transparent
         backgroundColor = UIColor.clear
     }
     
     required init?(coder aDecoder: NSCoder) {
-        // Set background colour to transparent
         super.init(coder: aDecoder)
+        autoresizingMask = [.flexibleWidth , .flexibleHeight]
         backgroundColor = UIColor.clear
     }
     

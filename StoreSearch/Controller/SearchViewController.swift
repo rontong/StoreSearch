@@ -73,26 +73,28 @@ class SearchViewController: UIViewController {
     
     func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
-        // There should never be a second landscapeVC, if it is not nil then return
+        // There should never be a second landscapeVC, so if landscapeVC is not nil then do not continue
         guard landscapeViewController == nil else {return}
         
         // Find the scene with Storyboard ID LandscapeViewController and instantiate it
         landscapeViewController = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as? LandscapeViewController
         
-        // Set size and position: frame of landscape view is as big as SearchViewController bounds
+        // Set size and position: frame of landscape view is as big as SearchViewController bounds.
         if let controller = landscapeViewController {
             controller.view.frame = view.bounds
             controller.view.alpha = 0
             
-            // Add landscape controller's view as a subview (on top of the tableview and search bar)
+            // Add landscape controller's view as a subview (on top of the tableview and search bar). Tell SearchVC that LandscapeVC is now in control.
             view.addSubview(controller.view)
-            
-            // Tell SearchVC that LandscapeVC is now in control
             addChildViewController(controller)
             
-            // Animate, then tell new VC it has a parent controller
+            // Animate alpha to 1, dismiss keyboard, dismiss detailVC, then call didMove() to tell new VC it has a parent controller (after animations)
             coordinator.animate(alongsideTransition: { _ in
+                if self.presentedViewController != nil {
+                    self.dismiss(animated: true, completion: nil)
+                }
                 controller.view.alpha = 1
+                self.searchBar.resignFirstResponder()
             }, completion: { _ in
                 controller.didMove(toParentViewController: self)
             })
@@ -100,13 +102,24 @@ class SearchViewController: UIViewController {
     }
     
     func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
+        // Tell VC it is leaving the VC hierarchy, remove the view from screen, and dispose of VC. Set to nil to remove strong reference.
         
-        // Tell VC it is leaving the VC hierarchy, remove the view from screen, and dispose of VC. Set to nil to remove strong reference. 
         if let controller = landscapeViewController {
+            
+            // Call willMove() to let childVC know it is about to be removed
             controller.willMove(toParentViewController: nil)
-            controller.view.removeFromSuperview()
-            controller.removeFromParentViewController()
-            landscapeViewController = nil
+            
+            coordinator.animate(alongsideTransition: { _ in
+                
+                // Animate alpha to 0
+                controller.view.alpha = 0
+            }, completion: { _ in
+                
+                // Call removeFromParentViewController() to send the "did move to parent" message
+                controller.view.removeFromSuperview()
+                controller.removeFromParentViewController()
+                self.landscapeViewController = nil
+            })
         }
     }
     

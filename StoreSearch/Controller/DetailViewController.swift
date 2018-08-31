@@ -10,6 +10,11 @@ import UIKit
 
 class DetailViewController: UIViewController {
 
+    enum AnimationStyle {
+        case slide
+        case fade
+    }
+    
     @IBOutlet weak var popupView: UIView!
     @IBOutlet weak var artworkImageView: UIImageView!
     @IBOutlet weak var nameLabel: UILabel!
@@ -20,6 +25,7 @@ class DetailViewController: UIViewController {
     
     var searchResult: SearchResult!
     var downloadTask: URLSessionDownloadTask?
+    var dismissAnimationStyle = AnimationStyle.fade
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -86,17 +92,9 @@ class DetailViewController: UIViewController {
         }
         priceButton.setTitle(priceText, for: .normal)
     }
-    
-    // Use the animation controller when presenting Detail pop-up
-    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return BounceAnimationController()
-    }
-    
-    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
-        return SlideOutAnimationController()
-    }
 
     @IBAction func close() {
+        dismissAnimationStyle = .slide
         dismiss(animated: true, completion: nil)
     }
     
@@ -121,6 +119,18 @@ extension DetailViewController: UIViewControllerTransitioningDelegate {
         
         // Tell UIKit to use the DimmingPresentationController when transitioning to Detail View Controller
         return DimmingPresentationController(presentedViewController: presented, presenting: presenting)
+    }
+    
+    // Use the animation controller when presenting Detail pop-up
+    func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        return BounceAnimationController()
+    }
+    
+    func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
+        switch dismissAnimationStyle {
+        case .slide: return SlideOutAnimationController()
+        case .fade: return FadeOutAnimationController()
+        }
     }
 }
 
