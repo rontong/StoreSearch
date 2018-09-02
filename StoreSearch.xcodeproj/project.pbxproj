@@ -116,9 +116,9 @@
 				F26264A92137623E0021731A /* DetailViewController.swift */,
 				F26264AB2137649A0021731A /* DimmingPresentationController.swift */,
 				F2588A0F2137CDC0009CAB2C /* GradientView.swift */,
+				F2588A152137D957009CAB2C /* LandscapeViewController.swift */,
 				F2588A112137D104009CAB2C /* BounceAnimationController.swift */,
 				F2588A132137D629009CAB2C /* SlideOutAnimationController.swift */,
-				F2588A152137D957009CAB2C /* LandscapeViewController.swift */,
 				F29DFE0E21391E6400DB5121 /* FadeOutAnimationController.swift */,
 			);
 			path = Controller;

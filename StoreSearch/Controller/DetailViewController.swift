@@ -116,7 +116,6 @@ class DetailViewController: UIViewController {
 extension DetailViewController: UIViewControllerTransitioningDelegate {
     
     func presentationController(forPresented presented: UIViewController, presenting: UIViewController?, source: UIViewController) -> UIPresentationController? {
-        
         // Tell UIKit to use the DimmingPresentationController when transitioning to Detail View Controller
         return DimmingPresentationController(presentedViewController: presented, presenting: presenting)
     }

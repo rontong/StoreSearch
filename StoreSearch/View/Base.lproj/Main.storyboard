@@ -38,7 +38,7 @@
                                 <items>
                                     <navigationItem id="fm6-ro-bKU">
                                         <nil key="title"/>
-                                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="qCP-WN-IdG">
+                                        <segmentedControl key="titleView" opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="bar" selectedSegmentIndex="0" id="qCP-WN-IdG">
                                             <rect key="frame" x="144.5" y="1.5" width="279" height="29"/>
                                             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                             <segments>
@@ -89,20 +89,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="568" height="320"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="We're in landscape" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="8DZ-nW-sCF">
-                                <rect key="frame" x="212" y="150" width="145" height="21"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                                <color key="textColor" red="0.99999600649999998" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <nil key="highlightedColor"/>
-                            </label>
+                            <scrollView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DUx-a0-DMM">
+                                <rect key="frame" x="0.0" y="0.0" width="568" height="320"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </scrollView>
+                            <pageControl opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" numberOfPages="3" translatesAutoresizingMaskIntoConstraints="NO" id="bsb-P0-mmn">
+                                <rect key="frame" x="264" y="141" width="39" height="37"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </pageControl>
                         </subviews>
                         <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="8DZ-nW-sCF" firstAttribute="centerX" secondItem="j7g-Vm-HIG" secondAttribute="centerX" id="1uw-fh-saH"/>
-                            <constraint firstItem="8DZ-nW-sCF" firstAttribute="centerY" secondItem="j7g-Vm-HIG" secondAttribute="centerY" id="HHT-kn-Wmh"/>
-                        </constraints>
                         <viewLayoutGuide key="safeArea" id="uKk-3V-3Mc"/>
                     </view>
+                    <connections>
+                        <outlet property="pageControl" destination="bsb-P0-mmn" id="lyS-fp-0mc"/>
+                        <outlet property="scrollView" destination="DUx-a0-DMM" id="rH2-QC-9bT"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="33K-4d-UCb" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

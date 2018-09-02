@@ -15,8 +15,8 @@ class SearchViewController: UIViewController {
     @IBOutlet weak var segmentedControl: UISegmentedControl!
     
     var searchResults = [SearchResult]()
-    var hasSearched = false
-    var isLoading = false
+    private var hasSearched = false
+    private var isLoading = false
     var dataTask: URLSessionDataTask?
     
     var landscapeViewController: LandscapeViewController?
@@ -79,8 +79,9 @@ class SearchViewController: UIViewController {
         // Find the scene with Storyboard ID LandscapeViewController and instantiate it
         landscapeViewController = storyboard!.instantiateViewController(withIdentifier: "LandscapeViewController") as? LandscapeViewController
         
-        // Set size and position: frame of landscape view is as big as SearchViewController bounds.
+        // Set size and position: frame of landscape view is as big as SearchViewController bounds. Give LandscapeVC the searchResults object
         if let controller = landscapeViewController {
+            controller.searchResults = searchResults
             controller.view.frame = view.bounds
             controller.view.alpha = 0
             
