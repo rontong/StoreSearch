@@ -21,7 +21,7 @@ class LandscapeViewController: UIViewController {
         super.viewDidLoad()
         
         // Remove automatic constraints from main view, pageControl and scrollVIew to allow custom layout
-        //translatesAutoresizingMaskConstraints allows manual positioning and sizing of frames (UIKit converts manual layout into constraints)
+        // translatesAutoresizingMaskConstraints allows manual positioning and sizing of frames (UIKit converts manual layout into constraints)
         view.removeConstraints(view.constraints)
         view.translatesAutoresizingMaskIntoConstraints = true
         
@@ -144,7 +144,7 @@ class LandscapeViewController: UIViewController {
     
     private func downloadImage(for searchResult: SearchResult, andPlaceOn button: UIButton) {
         
-        // Obtain URL object ad create a download task. Use completion handler to put downloaded file into UIImage. Use DispatchQueue to place image on a button.
+        // Obtain URL object and create a download task. Use completion handler to put downloaded file into UIImage. Use DispatchQueue to place image on a button.
         // Use weak reference so buttons are deallocated if LandscapeVC is deallocated
         if let url = URL(string: searchResult.artworkSmallURL) {
             let session = URLSession.shared
@@ -155,7 +155,7 @@ class LandscapeViewController: UIViewController {
                     let image = UIImage(data: data) {
                     DispatchQueue.main.async {
                         if let button = button {
-                            button.setImage(image, for: .normal)
+                            button.setImage(image.resizedImage(), for: .normal)
                         }
                     }
                 }

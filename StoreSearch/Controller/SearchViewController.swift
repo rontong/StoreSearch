@@ -228,7 +228,7 @@ class SearchViewController: UIViewController {
 }
         
     func parse(dictionary: [String: Any]) -> [SearchResult] {
-        // Converse JSON Dictionary to a SearchResult object
+        // Converts JSON Dictionary to a SearchResult object
         
         // If dictionary has a key named "results" then continue, otherwise perform the { closure }
         guard let array = dictionary["results"] as? [Any] else {
