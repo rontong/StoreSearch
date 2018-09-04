@@ -14,7 +14,8 @@ class LandscapeViewController: UIViewController {
     @IBOutlet weak var pageControl: UIPageControl!
     
     var searchResults = [SearchResult]()
-    private var firstTime = true 
+    private var firstTime = true
+    private var downloadTasks = [URLSessionDownloadTask()]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -110,10 +111,10 @@ class LandscapeViewController: UIViewController {
         for (index, searchResult) in searchResults.enumerated() {
             // for in enumerated() uses a tuple of SearchResult object and index in the array
             
-            // Create UIButton with a title (for debugging)
-            let button = UIButton(type: .system)
-            button.backgroundColor = UIColor.white
-            button.setTitle("\(index)", for: .normal)
+            // Create UIButton
+            let button = UIButton(type: .custom)
+            downloadImage(for: searchResult, andPlaceOn: button)
+            button.setBackgroundImage(UIImage(named: "LandscapeButton"), for: .normal)
             
             // Set frame of button and add as a subview of UIScrollView
             button.frame = CGRect(x: x + paddingHorz, y: marginY + CGFloat(row)*itemHeight + paddingVert, width: buttonWidth, height: buttonHeight)
@@ -141,17 +142,45 @@ class LandscapeViewController: UIViewController {
         pageControl.currentPage = 0
     }
     
+    private func downloadImage(for searchResult: SearchResult, andPlaceOn button: UIButton) {
+        
+        // Obtain URL object ad create a download task. Use completion handler to put downloaded file into UIImage. Use DispatchQueue to place image on a button.
+        // Use weak reference so buttons are deallocated if LandscapeVC is deallocated
+        if let url = URL(string: searchResult.artworkSmallURL) {
+            let session = URLSession.shared
+            let downloadTask = session.downloadTask(with: url) { [weak button] url, response, error in
+                if error == nil,
+                let url = url,
+                let data = try? Data(contentsOf: url),
+                    let image = UIImage(data: data) {
+                    DispatchQueue.main.async {
+                        if let button = button {
+                            button.setImage(image, for: .normal)
+                        }
+                    }
+                }
+            }
+            downloadTask.resume()
+            // Use downloadTasks to keep track of active URLSessionDownloadTask objects
+            downloadTasks.append(downloadTask)
+        }
+    }
+    
     @IBAction func pageChanged(_ sender: UIPageControl) {
         // When user taps Page Control, update current Page property to calculate new contentOffset for scrollView
-        // Place code in an animation block
+        // Place code in an animation block using UIView.animate(options)
         
-        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+        UIView.animate(withDuration: 0.9, delay: 0, options: [.curveEaseInOut], animations: {
             self.scrollView.contentOffset = CGPoint(x: self.scrollView.bounds.size.width * CGFloat(sender.currentPage), y: 0)
         }, completion: nil)
     }
     
     deinit {
+        // Cancel any download tasks still in operation
         print("deinit \(self)")
+        for task in downloadTasks {
+            task.cancel()
+        }
     }
 }
 
