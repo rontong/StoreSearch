@@ -31,6 +31,9 @@ class LandscapeViewController: UIViewController {
         scrollView.translatesAutoresizingMaskIntoConstraints = true
         
         scrollView.backgroundColor = UIColor(patternImage: UIImage(named: "LandscapeBackground")!)
+        
+        // Hides page control when there are no search results
+        pageControl.numberOfPages = 0
     }
 
     override func didReceiveMemoryWarning() {
@@ -132,19 +135,35 @@ class LandscapeViewController: UIViewController {
         
         scrollView.contentSize = CGSize(width: CGFloat(numPages)*scrollViewWidth, height: scrollView.bounds.size.height)
         print("Number of pages: \(numPages)")
+        
+        // Displays the number of dots on page control
+        pageControl.numberOfPages = numPages
+        pageControl.currentPage = 0
     }
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    
+    @IBAction func pageChanged(_ sender: UIPageControl) {
+        // When user taps Page Control, update current Page property to calculate new contentOffset for scrollView
+        // Place code in an animation block
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: [.curveEaseInOut], animations: {
+            self.scrollView.contentOffset = CGPoint(x: self.scrollView.bounds.size.width * CGFloat(sender.currentPage), y: 0)
+        }, completion: nil)
     }
-    */
-
+    
     deinit {
         print("deinit \(self)")
+    }
+}
+
+extension LandscapeViewController: UIScrollViewDelegate {
+    // Make view controller a delegate of Scroll View so it is notified when user flicks through pages
+ 
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        // Determine current page using contentOffset property.
+        
+        let width = scrollView.bounds.size.width
+        // contentOffset determines how far scroll view has been scrolled. If offset goes beyond halfway on the page then scroll view will flick to the next page
+        let currentPage = Int((scrollView.contentOffset.x + width/2) / width)
+        pageControl.currentPage = currentPage
     }
 }
