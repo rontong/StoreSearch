@@ -8,6 +8,8 @@
 
 import Foundation
 
+typealias SearchComplete = (Bool) -> Void
+
 class Search {
     var searchResults: [SearchResult] = []
     var hasSearched = false
@@ -15,7 +17,9 @@ class Search {
     
     private var dataTask: URLSessionDataTask? = nil
     
-    func performSearch(for text: String, category: Int) {
+    func performSearch(for text: String, category: Int, completion: @escaping SearchComplete) {
+        // Perform search using parameters passed from SearchVC. Completion closure executes when search is complete. @escaping necessary for closures not used immediately.
+        
         if !text.isEmpty {
             
             // If there is an active data task, cancel it so old search doesn't get in the way of a new search
@@ -30,9 +34,10 @@ class Search {
             let session = URLSession.shared
             
             // Create a data task to Send HTTPS GET requests to the server at url. Returns Data, URL Response, and Error. Completion handler is invoked on a background thread when data task recieves a reply from the server
+            // print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
             dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
                 
-                // print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
+                var success = false
                 
                 // Search Cancelled: Exit closure if error code -999 (cancel error)
                 if let error = error as? NSError, error.code == -999 {
@@ -51,11 +56,18 @@ class Search {
                     
                         print("Search Success!")
                         self.isLoading = false
-                        return
+                        success = true
                         }
-                print("Failure! \(response)")
+                
+                if !success {
                 self.hasSearched = false
                 self.isLoading = false
+                }
+                
+                // Update UI using main queue, calling completion(true) or completion(false)
+                DispatchQueue.main.async {
+                    completion(success)
+                }
                 })
             // Call resume to send request to the server once data task is created
             dataTask?.resume()

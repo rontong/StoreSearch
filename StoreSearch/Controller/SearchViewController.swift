@@ -125,7 +125,13 @@ class SearchViewController: UIViewController {
     
     func performSearch(){
         
-        search.performSearch(for: searchBar.text!, category: segmentedControl.selectedSegmentIndex)
+        // Calls completion closure using success parameter after search is complete
+        search.performSearch(for: searchBar.text!, category: segmentedControl.selectedSegmentIndex, completion: { success in
+            if !success {
+                self.showNetworkError()
+            }
+            self.tableView.reloadData()
+        })
         tableView.reloadData()
         searchBar.resignFirstResponder()
     }
