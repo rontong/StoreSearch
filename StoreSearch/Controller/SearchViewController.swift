@@ -125,8 +125,11 @@ class SearchViewController: UIViewController {
     
     func performSearch(){
         
+        if let category = Search.Category(rawValue: segmentedControl.selectedSegmentIndex) {
+        print("Performing search in category \(category)")
+            
         // Calls completion closure using success parameter after search is complete
-        search.performSearch(for: searchBar.text!, category: segmentedControl.selectedSegmentIndex, completion: { success in
+        search.performSearch(for: searchBar.text!, category: category, completion: { success in
             if !success {
                 self.showNetworkError()
             }
@@ -134,6 +137,7 @@ class SearchViewController: UIViewController {
         })
         tableView.reloadData()
         searchBar.resignFirstResponder()
+        }
     }
     
     
@@ -166,36 +170,38 @@ extension SearchViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
         // If search term has not been used do not return any rows. If loading return 1 row to display loadingCell. If the search array is empty return 1 row to display nothingFoundCell, if loading then return 1 row to display loadingCell
-        if search.isLoading {
-            return 1
-        } else if !search.hasSearched {
-            return 0
-        } else if search.searchResults.count == 0 {
-            return 1
-        } else {
-            return search.searchResults.count
+        switch search.state {
+        case .notSearchedYet: return 0
+        case .loading: return 1
+        case .noResults: return 1
+        case .results(let list): return list.count
         }
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        switch search.state {
+        case .notSearchedYet: fatalError("Should never get here")
+       
         // If loading then display loadingCell and animate the spinner
-        if search.isLoading {
+        case .loading:
             let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.loadingCell, for: indexPath)
             let spinner = cell.viewWithTag(100) as! UIActivityIndicatorView
             spinner.startAnimating()
             return cell
-            
-        // If the search array is empty then display .nothingFoundCell. Otherwise display the search results in a .searchResultCell
-        } else if search.searchResults.count == 0 {
+           
+        // If noResults then display nothingFound cell
+        case .noResults:
             return tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.nothingFoundCell, for: indexPath)
-        } else {
+
+        // If results found then bind array to temporary variable 'list' and display results in searchResultCell
+        case .results(let list):
             let cell = tableView.dequeueReusableCell(withIdentifier: TableViewCellIdentifiers.searchResultCell, for: indexPath) as! SearchResultCell
             cell.prepareForReuse()
-            let searchResult = search.searchResults[indexPath.row]
+            let searchResult = list[indexPath.row]
             cell.configure(for: searchResult)
             return cell
-            }
+        }
     }
 }
 
@@ -211,19 +217,20 @@ extension SearchViewController: UITableViewDelegate {
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
         // Only allows rows with search results to be selected
-        if search.searchResults.count == 0 || search.isLoading {
-            return nil
-        } else {
-            return indexPath
+        switch search.state {
+        case .notSearchedYet, .loading, .noResults: return nil
+        case .results: return indexPath
         }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowDetail" {
-            let detailVC = segue.destination as! DetailViewController
-            let indexPath = sender as! IndexPath
-            let searchResult = search.searchResults[indexPath.row]
-            detailVC.searchResult = searchResult
+            if case .results(let list) = search.state {
+                let detailVC = segue.destination as! DetailViewController
+                let indexPath = sender as! IndexPath
+                let searchResult = list[indexPath.row]
+                detailVC.searchResult = searchResult
+            }
         }
     }
 }

@@ -11,13 +11,38 @@ import Foundation
 typealias SearchComplete = (Bool) -> Void
 
 class Search {
-    var searchResults: [SearchResult] = []
-    var hasSearched = false
-    var isLoading = false
+    enum Category: Int {
+        case all = 0
+        case music = 1
+        case software = 2
+        case ebooks = 3
+        
+        var entityName: String {
+            switch self {
+            case .all: return ""
+            case .music: return "musicTrack"
+            case .software: return "software"
+            case .ebooks: return "ebook"
+            }
+        }
+    }
     
+    enum State {
+        case notSearchedYet
+        case loading
+        case noResults
+        case results([SearchResult])
+    }
+    
+//    var searchResults: [SearchResult] = []
+//    var hasSearched = false
+//    var isLoading = false
+    
+    // Other objects may read state, but only the Search class can assign new values to state
+    private(set) var state: State = .notSearchedYet
     private var dataTask: URLSessionDataTask? = nil
     
-    func performSearch(for text: String, category: Int, completion: @escaping SearchComplete) {
+    func performSearch(for text: String, category: Category, completion: @escaping SearchComplete) {
         // Perform search using parameters passed from SearchVC. Completion closure executes when search is complete. @escaping necessary for closures not used immediately.
         
         if !text.isEmpty {
@@ -25,10 +50,8 @@ class Search {
             // If there is an active data task, cancel it so old search doesn't get in the way of a new search
             dataTask?.cancel()
             
-            isLoading = true
-            hasSearched = true
-            searchResults = [SearchResult]()
-            
+            state = .loading
+    
             // Create URL object using search text. Create a URLSession object.
             let url = iTunesURL(searchText: text, category: category)
             let session = URLSession.shared
@@ -37,10 +60,12 @@ class Search {
             // print("On main thread? " + (Thread.current.isMainThread ? "Yes" : "No"))
             dataTask = session.dataTask(with: url, completionHandler: { data, response, error in
                 
+                self.state = .notSearchedYet
                 var success = false
                 
                 // Search Cancelled: Exit closure if error code -999 (cancel error)
                 if let error = error as? NSError, error.code == -999 {
+                    print("Search Cancelled")
                     return
                 }
                 
@@ -51,18 +76,15 @@ class Search {
                     let jsonData = data,
                     let jsonDictionary = self.parse(json: data!) {
                         
-                        self.searchResults = self.parse(dictionary: jsonDictionary)
-                        self.searchResults.sort(by: < )
-                    
-                        print("Search Success!")
-                        self.isLoading = false
+                        var searchResults = self.parse(dictionary: jsonDictionary)
+                    if searchResults.isEmpty {
+                        self.state = .noResults
+                    } else {
+                        searchResults.sort(by: <)
+                        self.state = .results(searchResults)
+                    }
                         success = true
                         }
-                
-                if !success {
-                self.hasSearched = false
-                self.isLoading = false
-                }
                 
                 // Update UI using main queue, calling completion(true) or completion(false)
                 DispatchQueue.main.async {
@@ -74,17 +96,11 @@ class Search {
             }
     }
     
-    func iTunesURL(searchText: String, category: Int) -> URL {
+    func iTunesURL(searchText: String, category: Category) -> URL {
         // Convert search text into a URL
         
         // Convert category index from a number to a string to be added to the URL
-        let entityName: String
-        switch category {
-        case 1: entityName = "musicTrack"
-        case 2: entityName = "software"
-        case 3: entityName = "ebook"
-        default: entityName = ""
-        }
+        let entityName = category.entityName
         
         // Place text from search bar into the url, then turn it into a URL object. Use URL encoding.
         // %d is a placeholder for integer numbers. %f is for numbers with decimal point. %@is is for objects such as strings.
