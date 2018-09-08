@@ -15,7 +15,7 @@ class LandscapeViewController: UIViewController {
     
     var search: Search!
     private var firstTime = true
-    private var downloadTasks = [URLSessionDownloadTask()]
+    private var downloadTasks = [URLSessionDownloadTask]()
     
     override func viewDidLoad() {
         super.viewDidLoad()

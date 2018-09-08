@@ -53,7 +53,7 @@ class SearchViewController: UIViewController {
     }
     
     @IBAction func segmentChanged(_ sender: UISegmentedControl) {
-        print("Segment changed: \(sender.selectedSegmentIndex)")
+        print("Segment changed: \(sender.selectedSegmentIndex). Proceeding to perfom search.")
         performSearch()
     }
     
@@ -70,6 +70,7 @@ class SearchViewController: UIViewController {
     
     func showLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         
+        print("Showing Landscape View")
         // There should never be a second landscapeVC, so if landscapeVC is not nil then do not continue
         guard landscapeViewController == nil else {return}
         
@@ -101,6 +102,7 @@ class SearchViewController: UIViewController {
     
     func hideLandscape(with coordinator: UIViewControllerTransitionCoordinator) {
         // Tell VC it is leaving the VC hierarchy, remove the view from screen, and dispose of VC. Set to nil to remove strong reference.
+        print("Hiding landscape view")
         
         if let controller = landscapeViewController {
             
@@ -108,16 +110,18 @@ class SearchViewController: UIViewController {
             controller.willMove(toParentViewController: nil)
             
             coordinator.animate(alongsideTransition: { _ in
-                
+
                 // Animate alpha to 0 and tell detail screen to close
-                controller.view.alpha = 0
                 if self.presentedViewController != nil {
                     self.dismiss(animated: true, completion: nil)
                 }
+                controller.view.alpha = 0
             }, completion: { _ in
-                
+              
                 // Call removeFromParentViewController() to send the "did move to parent" message
+                print("Remove view from Superview")
                 controller.view.removeFromSuperview()
+                print("Remove Parent View Controller")
                 controller.removeFromParentViewController()
                 self.landscapeViewController = nil
             })

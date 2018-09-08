@@ -110,7 +110,7 @@
                     <connections>
                         <outlet property="pageControl" destination="bsb-P0-mmn" id="lyS-fp-0mc"/>
                         <outlet property="scrollView" destination="DUx-a0-DMM" id="rH2-QC-9bT"/>
-                        <segue destination="Ulx-w4-jeE" kind="presentation" id="6hn-4N-kOZ"/>
+                        <segue destination="Ulx-w4-jeE" kind="presentation" identifier="ShowDetail" id="6hn-4N-kOZ"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="33K-4d-UCb" userLabel="First Responder" sceneMemberID="firstResponder"/>
