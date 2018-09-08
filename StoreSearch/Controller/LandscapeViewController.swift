@@ -58,11 +58,52 @@ class LandscapeViewController: UIViewController {
             
             switch search.state {
             case .notSearchedYet: break
-            case .loading: break
-            case .noResults: break
+            case .loading: showSpinner()
+            case .noResults: showNothingFoundLabel()
             case .results(let list): tileButtons(list)
             }
         }
+    }
+    
+    private func showSpinner() {
+        let spinner = UIActivityIndicatorView(activityIndicatorStyle: .whiteLarge)
+        spinner.center = CGPoint(x: scrollView.bounds.midX + 0.5, y: scrollView.bounds.midY + 0.5)
+        spinner.tag = 1000
+        view.addSubview(spinner)
+        spinner.startAnimating()
+    }
+    
+    private func hideSpinner() {
+        view.viewWithTag(1000)?.removeFromSuperview()
+    }
+    
+    func searchResultsReceived() {
+        hideSpinner()
+        switch search.state {
+        case .notSearchedYet, .loading: break
+        case .noResults: showNothingFoundLabel()
+        case .results(let list): tileButtons(list)
+        }
+    }
+    
+    private func showNothingFoundLabel() {
+        
+        // Create a UILabel, resize, and centre label
+        let label = UILabel(frame: CGRect.zero)
+        label.text = "Nothing Found"
+        label.textColor = UIColor.white
+        label.backgroundColor = UIColor.clear
+        
+        label.sizeToFit()
+        
+        // Use ceil() to round to next number and multiply by 2 to get the next even number
+        var rect = label.frame
+        rect.size.width = ceil(rect.size.width/2) * 2
+        rect.size.height = ceil(rect.size.height/2) * 2
+        label.frame = rect
+        
+        label.center = CGPoint(x: scrollView.bounds.midX, y: scrollView.bounds.midY)
+        view.addSubview(label)
     }
     
     private func tileButtons(_ searchResults: [SearchResult]) {
@@ -117,8 +158,11 @@ class LandscapeViewController: UIViewController {
         for (index, searchResult) in searchResults.enumerated() {
             // for in enumerated() uses a tuple of SearchResult object and index in the array
             
-            // Create UIButton
+            // Create UIButton with a tag and target action
             let button = UIButton(type: .custom)
+            button.tag = 2000 + index
+            button.addTarget(self, action: #selector(buttonPressed), for: .touchUpInside)
+            
             downloadImage(for: searchResult, andPlaceOn: button)
             button.setBackgroundImage(UIImage(named: "LandscapeButton"), for: .normal)
             
@@ -146,6 +190,20 @@ class LandscapeViewController: UIViewController {
         // Displays the number of dots on page control
         pageControl.numberOfPages = numPages
         pageControl.currentPage = 0
+    }
+    
+    @objc func buttonPressed(_ sender: UIButton) {
+        performSegue(withIdentifier: "ShowDetail", sender: sender)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == "ShowDetail" {
+            if case .results(let list) = search.state {
+                let detailViewController = segue.destination as! DetailViewController
+                let searchResult = list[(sender as! UIButton).tag - 2000]
+                detailViewController.searchResult = searchResult
+            }
+        }
     }
     
     private func downloadImage(for searchResult: SearchResult, andPlaceOn button: UIButton) {

@@ -109,8 +109,11 @@ class SearchViewController: UIViewController {
             
             coordinator.animate(alongsideTransition: { _ in
                 
-                // Animate alpha to 0
+                // Animate alpha to 0 and tell detail screen to close
                 controller.view.alpha = 0
+                if self.presentedViewController != nil {
+                    self.dismiss(animated: true, completion: nil)
+                }
             }, completion: { _ in
                 
                 // Call removeFromParentViewController() to send the "did move to parent" message
@@ -134,6 +137,7 @@ class SearchViewController: UIViewController {
                 self.showNetworkError()
             }
             self.tableView.reloadData()
+            self.landscapeViewController?.searchResultsReceived()
         })
         tableView.reloadData()
         searchBar.resignFirstResponder()

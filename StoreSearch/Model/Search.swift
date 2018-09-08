@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 typealias SearchComplete = (Bool) -> Void
 
@@ -49,6 +50,7 @@ class Search {
             
             // If there is an active data task, cancel it so old search doesn't get in the way of a new search
             dataTask?.cancel()
+            UIApplication.shared.isNetworkActivityIndicatorVisible = true
             
             state = .loading
     
@@ -88,6 +90,7 @@ class Search {
                 
                 // Update UI using main queue, calling completion(true) or completion(false)
                 DispatchQueue.main.async {
+                    UIApplication.shared.isNetworkActivityIndicatorVisible = false 
                     completion(success)
                 }
                 })
